@@ -19,15 +19,11 @@ game_sound = "xwing"
 if music_on and state == "menu":
     sounds.background.play(-1)  # loop
 
-
 hero_frames = ["playership2_red", "playership2_orange"]
 hero_frame_index = 0
 hero_frame_timer = 0
 hero_frame_delay = 35
-
-
 hero = Actor(hero_frames[hero_frame_index], (WIDTH // 2, HEIGHT - 50))
-
 
 enemies = []
 for i in range(5):
@@ -36,7 +32,6 @@ for i in range(5):
     enemy = Actor("enemyblack2", (x, y))
     enemy.speed = random.randint(2, 10)
     enemies.append(enemy)
-
 
 bullets = []
 bullet_speed = 7
@@ -51,14 +46,11 @@ def update():
     global hero_frame_timer, hero_frame_index
     if state == "playing":
         game_timer += 1
-
-
         hero_frame_timer += 1
         if hero_frame_timer >= hero_frame_delay:
             hero_frame_index = (hero_frame_index + 1) % len(hero_frames)
             hero.image = hero_frames[hero_frame_index]
             hero_frame_timer = 0
-
         # hero (xwing) moves
         if keyboard.left:
             hero.x -= 5
@@ -143,6 +135,9 @@ def draw():
         sound_button = Rect((WIDTH // 2 - 100, 295), (200, 50))
         screen.draw.filled_rect(sound_button, "darkred")
         screen.draw.text("Ses Aç/Kapa", center=(WIDTH // 2, 320), fontsize=30, color="white")
+        exit_button = Rect((WIDTH // 2 - 100, 365), (200, 50))
+        screen.draw.filled_rect(exit_button, "darkred")
+        screen.draw.text("Çıkış", center=(WIDTH // 2, 390), fontsize=30, color="white")
     elif state == "playing":
         screen.fill("black")
         hero.draw()
@@ -159,12 +154,14 @@ def draw():
         screen.fill("black")
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2), fontsize=60, color="red")
         screen.draw.text("Kills: " + str(kill_count), center=(WIDTH // 2, HEIGHT // 2 + 50), fontsize=40, color="white")
+        screen.draw.text("Press Enter ", center=(WIDTH // 2 , HEIGHT // 2-250),fontsize=40, color="white")
 
 def on_mouse_down(pos):
     global state, music_on
     if state == "menu":
         start_button = Rect((WIDTH // 2 - 100, 225), (200, 50))
         sound_button = Rect((WIDTH // 2 - 100, 295), (200, 50))
+        exit_button = Rect((WIDTH // 2 - 100, 365), (200, 50))
         if start_button.collidepoint(pos):
             state = "playing"
             sounds.start.play()
@@ -183,8 +180,14 @@ def on_mouse_down(pos):
                     sounds.background.stop()
                 elif state == "playing":
                     sounds.xwing.stop()
+        elif exit_button.collidepoint(pos):
+            exit()
 
 def on_key_down(key):
+    global state
     if state == "playing" and key == keys.SPACE:
         bullet = Actor("laser", (hero.x, hero.y))
         bullets.append(bullet)
+    elif state == "game_over" and key == keys.RETURN:
+        state = "menu"
+
